@@ -36,21 +36,23 @@ public class SlowLorisGUI extends Application {
     public GridPane genCenterSide(){
         GridPane grid = new GridPane();
         VBox vbox = new VBox(5);
-        TextField hostTF = new TextField();
-        TextField portTF = new TextField();
-        TextField timeoutTF = new TextField();
-        TextField tcpTimeoutTF = new TextField();
-        TextField connectionsTF = new TextField();
+        TextField hostTF = new TextField("127.0.0.1");
+        TextField portTF = new TextField("8888");
+        TextField timeoutTF = new TextField("100000");
+        TextField tcpTimeoutTF = new TextField("5000");
+        TextField connectionsTF = new TextField("50");
         CheckBox cacheCB = new CheckBox("Cache");
         Button attackBtn = new Button("Atack");
         Button stopBtn = new Button("Stop");
 
         attackBtn.setOnAction(e -> {
-            new SlowLoris(hostTF.getText(),
-                    Integer.parseInt(portTF.getText()),
-                    Integer.parseInt(timeoutTF.getText()),
-                    Integer.parseInt(tcpTimeoutTF.getText()),
-                    Integer.parseInt(connectionsTF.getText())).start();
+            for(int i = 0; i < Integer.parseInt(connectionsTF.getText()); i++) {
+                new SlowLoris(hostTF.getText(),
+                        Integer.parseInt(portTF.getText()),
+                        Integer.parseInt(timeoutTF.getText()),
+                        Integer.parseInt(tcpTimeoutTF.getText()),
+                        Integer.parseInt(connectionsTF.getText())).start();
+            }
         });
 
         grid.add(new Label("Host:"), 0, 0);  		grid.add(hostTF, 1, 0);
@@ -60,7 +62,7 @@ public class SlowLorisGUI extends Application {
         grid.add(new Label("Connections:"), 0, 4);  grid.add(connectionsTF, 1, 4);
         grid.add(attackBtn, 0, 5);					grid.add(stopBtn, 1, 5);
         grid.setAlignment(Pos.CENTER);
-        grid.setVgap(5);
+        grid.setVgap(10);
         grid.setHgap(5);
 
         return grid;
