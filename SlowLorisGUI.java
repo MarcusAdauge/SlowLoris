@@ -32,6 +32,7 @@ public class SlowLorisGUI extends Application {
     BorderPane borderPane;
     ArrayList<SlowLoris> lorises = new ArrayList<SlowLoris>();
     static ThreadGroup group = new ThreadGroup("thread group");
+    SlowLoris loris = null;
 
     public static void main(String[] args) {
         launch(args);
@@ -44,19 +45,19 @@ public class SlowLorisGUI extends Application {
         scene = new Scene(borderPane, SCENE_WIDTH, SCENE_HEIGHT);
 
 
-        borderPane.setCenter(genCenterSide());
+        borderPane.setCenter(nonAttackScene());
         window.setScene(scene);
         window.show();
     }
 
-    public GridPane genCenterSide(){
+    public GridPane nonAttackScene(){
         GridPane grid = new GridPane();
         grid.setStyle("-fx-background-color: #BCD2EE");
         VBox vbox = new VBox(5);
         TextField hostTF = new TextField("127.0.0.1");
         TextField portTF = new TextField("8888");
         TextField timeoutTF = new TextField("100");
-        TextField connectionsTF = new TextField("50");
+        TextField connectionsTF = new TextField("500");
         Button attackBtn = new Button("ATTACK");
         attackBtn.setStyle("-fx-text-fill: dodgerblue");
         ImageView logoImageView = new ImageView(new Image("file:///D:/JavaWorkspace/SlowLoris/res/title.png"));
@@ -68,15 +69,11 @@ public class SlowLorisGUI extends Application {
         attackBtnImageView.setOnMouseClicked(e -> {
             window.setScene(attackScene());
             int threads = 50;
-
-            for(int i = 0; i < threads; i++) {
-                SlowLoris loris =  new SlowLoris(group, hostTF.getText(),
-                                            Integer.parseInt(portTF.getText()),
-                                            Integer.parseInt(timeoutTF.getText()) * 1000,
-                                            Integer.parseInt(connectionsTF.getText()));
-                loris.start();
-                lorises.add(loris);
-            }
+            loris =  new SlowLoris(hostTF.getText(),
+                                    Integer.parseInt(portTF.getText()),
+                                    Integer.parseInt(timeoutTF.getText()) * 1000,
+                                    Integer.parseInt(connectionsTF.getText()));
+            loris.start();
         });
 
         HBox buttonsHBox = new HBox(10);
@@ -98,40 +95,25 @@ public class SlowLorisGUI extends Application {
 
 
     public Scene attackScene(){
-
+        // explosion animation setup
         ImageView imageView = new ImageView(atackAnimationImage);
         imageView.setViewport(new Rectangle2D(0, 0, 128, 128));
-
-        final Animation animation = new SpriteAnimation(
-                imageView,
-                Duration.millis(2000),
-                24, 8,
-                0, 0,
-                128, 128
-        );
+        final Animation animation = new SpriteAnimation(imageView,  Duration.millis(2000), 24, 8, 0, 0, 128, 128);
         animation.setCycleCount(Animation.INDEFINITE);
 
         VBox vbox = new VBox(50);
         vbox.setAlignment(Pos.CENTER);
         vbox.setStyle("-fx-background-color: #C67171");
         Scene attack_scene = new Scene(vbox, SCENE_WIDTH, SCENE_HEIGHT);
-
         ImageView stopBtnImageView = new ImageView(new Image("file:///D:/JavaWorkspace/SlowLoris/res/stopBtn.png"));
-        Label activeThreads = new Label("Active threads: ");
-
-        System.out.println(group.activeCount());
 
         stopBtnImageView.setOnMouseClicked(e -> {
-            for (SlowLoris sl: lorises) {
-                sl.stopFunc();
-            }
-            //group.interrupt();
+            loris.stopAttack();
             window.setScene(scene);
         });
 
         animation.play();
         vbox.getChildren().addAll(new Label("Server is under attack..."), imageView, stopBtnImageView);
-
         return attack_scene;
     }
 
